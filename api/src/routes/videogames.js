@@ -1,49 +1,55 @@
 const { Router } = require('express');
-const { Videogame, Genre } = require('../db.js');
+const { Videogame } = require('../db.js');
 // Importar todos los routers;
 // Ejemplo: const authRouter = require('./auth.js');
-const api = require("./endpoints")
+const api = require("../endpoints")
 const router = Router();
 
-router.get("/videogames", (req, res) => {
-    var count = 0;
-    console.log("pasamo el router 1 papu")
-    const filter = (() => {
-        objCreator = function(source) {
-            return {
-                id: source.id,
-                name: source.name,
-                description: source.description,
-                date: source.released,
-                rating: source.rating,
-                platforms: source.platforms.map((e) => {
-                    return e.platform.name;
+router.get("/", (req, res) => {
+    if(req.query.hasOwnProperty("name"))
+        api.SEARCH_GAME_NAME(req.query.name, (source) => {
+            var all = {results: []};
+
+            for(let i = 0; i < 15 && i < source.results.length; i++)
+                all.results.push(api.objCreator(source.results[i]))
+            
+            if(all.results.length < 15)
+                Videogame.findAll({
+                    where:{
+                        name: {
+                            [Op.iLike]: `%${req.query.name}%` 
+                        }
+                    }
                 })
-            }
-        }
-        
-        if(req.query.hasOwnProperty("name"))
-            return function (source) {
-                if(source.name.search(req.query.name) >= 0)
-                    return objCreator(source);
-            }
-        else
-            return function (source) {
-                return objCreator(source);
-            }
-    })()
-    console.log("pasamo el router 2 papu")
+                .then((source)=>{
+                    console.log(source)
+                    let final = {...all}
+                    for(let i = 0; final.results.length < 15 && i < source.length; i++)
+                        final.results.push(source[i]);
 
-    const all = fetch(`https://api.rawg.io/api/games?key=${API_KEY}`)
-    .then(r => r.json())
-    .then((source) => {
-        count++;
-        console.log("pasamo el fetch papu")
-        if(count <= 15)
-            return filter(source);
-    })
+                    if(final.results.length > 0)
+                        res.status(200).json(final)
+                    else
+                        res.status(200).json("No se encotro ningun resultado para '" + req.query.name + "'")
+                })
+                .catch(error => {
+                    res.status(400).send(error)
+                })
+            else
+                res.status(200).json(all)
+        })
+        .catch(error => {
+            res.status(400).send(error)
+        })
+    else
+        api.SEARCH_ALL((source) => {
+            var all = {results: []};
 
-    return res.status(200).json(all);
+            for(let i = 0; i < 15 && i < source.results.length; i++)
+                all.results.push(api.objCreator(source.results[i]))
+            
+                res.status(200).json(all)
+        })
 })
 
 module.exports = router;
