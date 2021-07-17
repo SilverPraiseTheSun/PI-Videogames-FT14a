@@ -1,9 +1,9 @@
 const { Router } = require('express');
-const { Genre } = require('../db.js');
-const api = require("../endpoints")
 const router = Router();
+const { Genre } = require('../db.js');
+const api = require("../api_source")
 
-router.get("/", (req, res) => {
+router.get("/", (_req, res) => {
     const ressend = {results:[]};
     Genre.findAll()
     .then((source) => {

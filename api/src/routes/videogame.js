@@ -1,7 +1,7 @@
 const { Router } = require('express');
-const { Videogame, videogames_genres, Genre } = require('../db.js');
-const api = require("../endpoints")
 const router = Router();
+const { Videogame, videogames_genres, Genre } = require('../db.js');
+const api = require("../api_source")
 
 router.get("/:id", (req, res) => {
     api.SEARCH_GAME_ID(req.params.id, (source) => {
@@ -53,7 +53,7 @@ router.get("/:id", (req, res) => {
                 })
         }
         else
-            res.status(200).send(objCreator(source))
+            res.status(200).send(api.objCreator(source))
     })
     .catch(error => {
         res.status(400).send(error)

@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-const API_KEY = "7f6a0fa5813e4efbaed93a7c8f592874";
+const { API_KEY } = process.env;
 
 objCreator = (source) => {
     let genres = []
@@ -9,20 +9,27 @@ objCreator = (source) => {
             name: e.name
         })
     })
-    
+    var platforms = ["no entry"]
+    if(typeof source.platforms[0] == "string")
+        platforms = source.platforms[0];
+    else
+        platforms = source.platforms.map(e => {
+            return e.platform.name
+        })
     return {
         id: source.id,
         name: source.name || "no entry",
         description: source.description || "no entry",
         date: source.released,
         rating: source.rating || 0,
-        genres : genres,
-        platforms: source.platforms || ["no entry"]
+        genres: genres,
+        platforms: platforms,
+        img: source.background_image
     }
 }
 
-SEARCH_ALL = (handler) => {
-    return fetch(`https://api.rawg.io/api/games?key=${API_KEY}`)
+SEARCH_ALL = (page, handler) => {
+    return fetch(`https://api.rawg.io/api/games?key=${API_KEY}&&page=${page}`)
     .then(r => r.json())
     .then(handler)
 }
