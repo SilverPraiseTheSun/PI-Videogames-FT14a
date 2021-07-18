@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPages } from "../store/actions";
 import Card from "./Card"
 
-export default function Cards({genre, rating, games}){
+export default function Cards({page, genre, rating, games}){
+    const indice = page * 15;
     const [sortVideogames, setSortVideogames] = useState([])
     const videogames = useSelector(state => state.videogames)
-
+    const dispatch = useDispatch()
+    useEffect(() =>{},[sortVideogames])
     useEffect(()=>{
         let aux = videogames
 
@@ -16,12 +19,14 @@ export default function Cards({genre, rating, games}){
                 case "added":
                     aux = aux.filter(game => {
                         if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(game.id))
-                            return game;
+                            return true;
+                        return false
                     })
                 case "api": 
                     aux = aux.filter(game => {
                         if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(game.id))
-                            return game;
+                            return true;
+                        return false
                     })
                 default:
                     break;
@@ -32,24 +37,34 @@ export default function Cards({genre, rating, games}){
                 for(let i = 0; i < game.genres.length; i++)
                 {
                     if(game.genres[i].name == genre)
-                        return game;
+                        return true;
                 }
+
+                return false
             })
+
         aux = aux.sort((g1, g2)=> {
             return rating ? g1.rating - g2.rating : g2.rating - g1.rating
         })
 
         setSortVideogames(aux)
     }, [videogames, genre, rating, games])
+    
+    useEffect(() => {
+        setPages(Math.ceil(sortVideogames.length / 15), dispatch)
+    }, [sortVideogames])
 
-    return (
-        sortVideogames && sortVideogames.map(game => 
-            <Card
-                id={game.id}
-                name={game.name}
-                img={game.img}
-                genres={game.genres}
-                key={game.id}
-            />)
-    )
+    const arr = []
+
+    for(let i = indice - 15; i < indice && i < sortVideogames.length; i++)
+    {
+        arr.push(<Card
+            id={sortVideogames[i].id}
+            name={sortVideogames[i].name}
+            img={sortVideogames[i].img}
+            genres={sortVideogames[i].genres}
+        />)
+    }
+
+    return arr
 }

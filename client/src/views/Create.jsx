@@ -37,17 +37,17 @@ export default function Create(){
         }))
     },[genres])
 
+    const handleChange = (e) => {
+        let obj = post;
+        obj[e.target.name] = e.target.value
+        setPost(obj)
+    }
+    
     const handleGenresClick = (e) => {
         let arr = arrGenres
         arr = arr.map(genre => (genre.value == e.target.value) ? {...genre, isCheked: e.target.checked} : genre)
 
         setGenres(arr)
-    }
-
-    const handleChange = (e) => {
-        let obj = post;
-        obj[e.target.name] = e.target.value
-        setPost(obj)
     }
     
     const handlePlatformsClick = (e) => {
@@ -58,10 +58,23 @@ export default function Create(){
         setPlatforms(arr)
     } 
 
+    const handleSubmit = (e) =>{
+        e.preventDefault()
+        setPost({...post, 
+            genres: arrGenres.filter(g=> {
+                if(g.isCheked) return g
+            }),
+            platforms: arrPlatforms.filter(p=> {
+                return p.isCheked
+            })
+        })
+        postVideogame(post, dispatch)
+    }
+
     return (
         <div>
             <h1>Add New Videogame</h1>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div>
                     <label>Name</label>
                     <input type="text" name="name" onChange={handleChange}/>
@@ -90,7 +103,7 @@ export default function Create(){
                         ))}
                     </ul>
                 </div>
-                <button>Submit</button>
+                <button type="submit">Submit</button>
             </form>
         </div>
     )

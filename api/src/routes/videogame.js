@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const { Videogame, videogames_genres, Genre } = require('../db.js');
+const { Op } = require("sequelize");
 const api = require("../api_source")
 
 router.get("/:id", (req, res) => {
@@ -61,12 +62,17 @@ router.get("/:id", (req, res) => {
 })
 
 router.post("/", (req, res) => {
-    const obj = api.objCreator(req.query);
+    const obj = api.objCreator(req.body);
     Videogame.create(obj)
-    .then(() => {
-        res.status(200).json(obj);
+    .then((game) => {
+        req.body.genres.forEach(g => {
+            videogames_genres.create({videogameId: game.id, genreId: g.id})
+        })
+    }).then(() => {
+        res.status(200).send()
     })
     .catch(error => {
+        console.log(error)
         res.status(400).json(error)
     })
 })

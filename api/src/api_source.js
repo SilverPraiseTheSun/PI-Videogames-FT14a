@@ -2,20 +2,18 @@ const fetch = require("node-fetch")
 const { API_KEY } = process.env;
 
 objCreator = (source) => {
-    let genres = []
-    source.genres && source.genres.forEach(e => {
-        genres.push({
+    let genres = source.genres ? source.genres.map(e => {
+        console.log(source.genres)
+        return {
             id: e.id,
             name: e.name
-        })
-    })
-    var platforms = ["no entry"]
-    if(typeof source.platforms[0] == "string")
-        platforms = source.platforms[0];
-    else
-        platforms = source.platforms.map(e => {
-            return e.platform.name
-        })
+        }
+    }) : []
+
+    var platforms = source.platforms ? source.platforms.map(e => {
+        return e.name
+    }) : ["no entry"]
+        
     return {
         id: source.id,
         name: source.name || "no entry",
@@ -29,13 +27,13 @@ objCreator = (source) => {
 }
 
 SEARCH_ALL = (page, handler) => {
-    return fetch(`https://api.rawg.io/api/games?key=${API_KEY}&&page=${page}`)
+    return fetch(`https://api.rawg.io/api/games?key=${API_KEY}&&page=${page}&&page_size=40`)
     .then(r => r.json())
     .then(handler)
 }
 
-SEARCH_GAME_NAME = (name, handler) => {
-    return fetch(`https://api.rawg.io/api/games?search=${name}&&key=${API_KEY}`)
+SEARCH_GAME_NAME = (page, name, handler) => {
+    return fetch(`https://api.rawg.io/api/games?search=${name}&&key=${API_KEY}&&page=${page}&&page_size=40`)
     .then(r => r.json())
     .then(handler)
 }

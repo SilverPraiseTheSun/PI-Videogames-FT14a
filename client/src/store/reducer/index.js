@@ -2,11 +2,13 @@ import {
     GET_SEARCH,
     GET_VIDEOGAME,
     GET_GENRES,
-    POST_VIDEOGAME
+    POST_VIDEOGAME,
+    SET_PAGES
 } from "../actions/index.js"
 
 const initialState = {
     search: null,
+    pages: 1,
     videogames: [],
     genres: [],
     platforms: [
@@ -33,6 +35,10 @@ const reducer = (state = initialState, action) => {
         case GET_GENRES : return {
             ...state,
             genres: action.payload
+        }
+        case SET_PAGES : return {
+            ...state,
+            pages: action.payload
         }
         case POST_VIDEOGAME : return state
         default : return state

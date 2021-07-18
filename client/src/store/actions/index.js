@@ -2,6 +2,7 @@ export const GET_SEARCH = "get_search"
 export const GET_VIDEOGAME = "get_videogame"
 export const POST_VIDEOGAME = "post_videogame"
 export const GET_GENRES = "get_genres"
+export const SET_PAGES = "set_pages"
 
 export const getSearch = (name = null, dispatch) => {
     if(name)
@@ -64,5 +65,12 @@ export const postVideogame = (params, dispatch) => {
             type: POST_VIDEOGAME,
             payload: source.results
         })
+    })
+}
+
+export const setPages = (pages, dispatch) => {
+    dispatch({
+        type: SET_PAGES,
+        payload: pages
     })
 }
