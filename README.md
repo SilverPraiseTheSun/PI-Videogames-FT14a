@@ -1,4 +1,6 @@
-## Videogames Database
+<h1> Videogames Database </h1>
+
+## Descripción
 <p>Aplicacion para la busqueda, filtrado y agregado de videojuegos</p>
 
 ## Instrucciones
